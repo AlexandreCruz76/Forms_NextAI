@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário de Automação - Empresa de Transporte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1F4788 0%, #2E75B6 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .section-title {
+            background: #f5f5f5;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1F4788;
+            margin-bottom: 25px;
+            border-left: 4px solid #2E75B6;
+        }
+        
+        .question-group {
+            margin-bottom: 25px;
+        }
+        
+        .question-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2E75B6;
+            box-shadow: 0 0 0 3px rgba(46, 117, 182, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .checkbox-group,
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        input[type="checkbox"],
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #2E75B6;
+        }
+        
+        .checkbox-item label,
+        .radio-item label {
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 40px;
+            border-top: 1px solid #eee;
+            background: #fafafa;
+        }
+        
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-prev {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-prev:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+        
+        .btn-next,
+        .btn-submit {
+            background: #2E75B6;
+            color: white;
+        }
+        
+        .btn-next:hover:not(:disabled),
+        .btn-submit:hover:not(:disabled) {
+            background: #1F4788;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 117, 182, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .progress {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .progress-item {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s;
+        }
+        
+        .progress-item.active {
+            background: #2E75B6;
+            transform: scale(1.5);
+        }
+        
+        .section-counter {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .success-message {
+            display: none;
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            color: #2e7d32;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .success-message h2 {
+            margin-bottom: 10px;
+        }
+        
+        .spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner.loading {
+            display: block;
+        }
+        
+        .spinner::after {
+            content: "";
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2E75B6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+                padding: 20px;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Questionário de Automação</h1>
+            <p>Diagnóstico de Oportunidades de RPA + IA para Empresa de Transporte</p>
+        </div>
+        
+        <div class="content" id="formContent"></div>
+        
+        <div class="navigation">
+            <button class="btn-prev" id="prevBtn" onclick="previousSection()" disabled>← Anterior</button>
+            <div class="progress" id="progressBar"></div>
+            <div class="section-counter"><span id="currentSection">1</span>/<span id="totalSections">11</span></div>
+            <button class="btn-next" id="nextBtn" onclick="nextSection()">Próximo →</button>
+        </div>
+    </div>
+
+    <script>
+        const sections = [
+            {
+                title: "SEÇÃO 1: INFORMAÇÕES GERAIS",
+                questions: [
+                    { id: "q1", label: "Qual é o nome da sua empresa?", type: "text" },
+                    { id: "q2", label: "Quantos funcionários a empresa tem no total?", type: "number" },
+                    { id: "q3", label: "Quantos funcionários trabalham na área administrativa?", type: "number" },
+                    { id: "q4", label: "Qual é o faturamento anual aproximado (em reais)?", type: "number" },
+                    { id: "q5", label: "Quantos clientes ativos vocês têm?", type: "number" },
+                    { id: "q6", label: "Quantos fornecedores ativos vocês trabalham?", type: "number" },
+                    { id: "q7", label: "Quantas operações/movimentos por mês?", type: "number" },
+                    { id: "q8", label: "Há quanto tempo a empresa opera (anos)?", type: "number" }
+                ]
+            },
+            {
+                title: "SEÇÃO 2: ESTRUTURA ADMINISTRATIVA",
+                questions: [
+                    { id: "q9", label: "Quantas pessoas trabalham na tesouraria/financeiro?", type: "number" },
+                    { id: "q10", label: "Nomes dessas pessoas:", type: "text" },
+                    { id: "q11", label: "Quantas pessoas na contabilidade interna?", type: "number" },
+                    { id: "q12", label: "A contabilidade é interna ou terceirizada?", type: "radio", options: ["Interna", "Terceirizada", "Mista"] },
+                    { id: "q13", label: "Qual é a formação/experiência do gerente administrativo?", type: "text" },
+                    { id: "q14", label: "Existe um sistema ERP integrado? Qual?", type: "text" },
+                    { id: "q15", label: "O ERP está completamente integrado?", type: "radio", options: ["Completamente", "Parcialmente", "Isolado", "Não temos ERP"] }
+                ]
+            },
+            {
+                title: "SEÇÃO 3: NOTAS FISCAIS & ENTRADA",
+                questions: [
+                    { id: "q16", label: "De quantas formas as notas fiscais chegam? (Marque TODAS)", type: "checkbox", options: ["Email PDF", "Email XML", "Portal fornecedor", "Papel", "EDI/SFTP", "WhatsApp", "Outro"] },
+                    { id: "q17", label: "Quantas notas de ENTRADA (compras) por mês?", type: "number" },
+                    { id: "q18", label: "Quantas notas de SAÍDA (vendas) por mês?", type: "number" },
+                    { id: "q19", label: "Tempo médio: recebimento até lançamento (dias)?", type: "number" },
+                    { id: "q20", label: "Tempo médio: lançamento até pagamento (dias)?", type: "number" },
+                    { id: "q21", label: "Descreva o fluxo atual de uma nota fiscal (entrada até pagamento):", type: "textarea" },
+                    { id: "q22", label: "Como fazem conferência entre NF e pedido/recebimento?", type: "textarea" },
+                    { id: "q23", label: "Quantas notas com problemas por mês?", type: "number" },
+                    { id: "q24", label: "Tempo para resolver uma discrepância (horas)?", type: "number" },
+                    { id: "q25", label: "Top 3 tipos de erro mais comuns:", type: "textarea" },
+                    { id: "q26", label: "Existe relatório de status das notas fiscais?", type: "radio", options: ["Sim", "Não"] }
+                ]
+            },
+            {
+                title: "SEÇÃO 4: PAGAMENTOS & FLUXO DE CAIXA",
+                questions: [
+                    { id: "q28", label: "Como definem quais contas pagar e quando?", type: "textarea" },
+                    { id: "q29a", label: "% Transferência bancária:", type: "number" },
+                    { id: "q29b", label: "% TED/DOC:", type: "number" },
+                    { id: "q29c", label: "% Boleto:", type: "number" },
+                    { id: "q29d", label: "% Cheque:", type: "number" },
+                    { id: "q29e", label: "% PIX:", type: "number" },
+                    { id: "q30", label: "Qual é o banco principal?", type: "text" },
+                    { id: "q32", label: "Quem é responsável pela conciliação bancária?", type: "text" },
+                    { id: "q33", label: "Com que frequência fazem conciliação?", type: "radio", options: ["Diária", "Semanal", "Mensal", "Quando dá", "Não regularmente"] },
+                    { id: "q34", label: "Horas por conciliação?", type: "number" },
+                    { id: "q35", label: "Qual ferramenta usam?", type: "radio", options: ["Excel", "Banco online", "Sistema contábil", "Outro"] },
+                    { id: "q36", label: "Fazem previsão de fluxo de caixa?", type: "radio", options: ["Sim", "Não"] },
+                    { id: "q38", label: "Como fazem previsão?", type: "radio", options: ["Excel", "Sistema", "Combinação", "Manual", "Não estruturado"] },
+                    { id: "q39", label: "Horas/mês atualizando previsão?", type: "number" },
+                    { id: "q40", label: "Onde mantêm contas a pagar?", type: "radio", options: ["Excel", "Sistema", "Email", "Papel", "Combinação"] },
+                    { id: "q42", label: "Valor médio de contas que vencem diariamente (R$)?", type: "number" },
+                    { id: "q43", label: "Quantas surpresas/alterações de fluxo por mês?", type: "number" }
+                ]
+            },
+            {
+                title: "SEÇÃO 5: RECEBIMENTOS & COBRANÇA",
+                questions: [
+                    { id: "q45", label: "Como emitem notas de SAÍDA? (Marque TODAS)", type: "checkbox", options: ["Sistema ERP", "NFe online", "Planilha", "Manual", "Outro"] },
+                    { id: "q46", label: "Quantas notas de saída por mês?", type: "number" },
+                    { id: "q47", label: "Tempo para emitir uma NF (minutos)?", type: "number" },
+                    { id: "q48", label: "% de notas que precisam ajuste?", type: "number" },
+                    { id: "q49", label: "Como acompanham recebimentos?", type: "textarea" },
+                    { id: "q50", label: "Têm lista de clientes em atraso?", type: "radio", options: ["Sim, atualizada", "Sim, desatualizada", "Desorganizado", "Não"] },
+                    { id: "q51", label: "Formato da lista:", type: "radio", options: ["Excel", "Sistema", "Manual", "Email", "Outro"] },
+                    { id: "q52", label: "% receita em atraso (>30 dias)?", type: "number" },
+                    { id: "q53", label: "Valor total em atraso (R$)?", type: "number" },
+                    { id: "q54", label: "Quem faz a cobrança?", type: "text" },
+                    { id: "q55", label: "Descreva o processo de cobrança:", type: "textarea" },
+                    { id: "q56", label: "Taxa de sucesso 1º contato (%)?", type: "number" },
+                    { id: "q57", label: "Taxa de sucesso 2º contato (%)?", type: "number" },
+                    { id: "q58", label: "Usam automação para cobrança?", type: "radio", options: ["Sim", "Não"] }
+                ]
+            },
+            {
+                title: "SEÇÃO 6: CONTÁBIL & COMPLIANCE",
+                questions: [
+                    { id: "q59", label: "Dias para fechar contabilidade após mês?", type: "number" },
+                    { id: "q60", label: "Descreva o processo de fechamento contábil:", type: "textarea" },
+                    { id: "q61", label: "Qual é o maior gargalo no fechamento?", type: "textarea" },
+                    { id: "q62", label: "Como calculam IRRF?", type: "radio", options: ["Manual", "Sistema automático", "Contadora faz"] },
+                    { id: "q63", label: "% de contas com retenção?", type: "number" },
+                    { id: "q64", label: "Quais impostos pagam? (Marque TODOS)", type: "checkbox", options: ["ICMS", "ISS", "PIS", "COFINS", "INSS", "Outro"] },
+                    { id: "q65", label: "Como acompanham obrigações fiscais?", type: "radio", options: ["Excel", "Sistema", "Contadora", "Desorganizado"] },
+                    { id: "q66", label: "Quantas obrigações fiscais mensais?", type: "number" },
+                    { id: "q67", label: "Quantas obrigações fiscais anuais?", type: "number" },
+                    { id: "q68", label: "Fazem auditoria interna?", type: "radio", options: ["Sim", "Não"] },
+                    { id: "q70", label: "Qual é o maior risco de não-conformidade?", type: "textarea" },
+                    { id: "q71", label: "Têm política LGPD formal?", type: "radio", options: ["Sim", "Não", "Iniciando"] },
+                    { id: "q72", label: "Risco de multa LGPD?", type: "radio", options: ["Baixo", "Médio", "Alto", "Não sabe"] }
+                ]
+            },
+            {
+                title: "SEÇÃO 7: INFRAESTRUTURA TECNOLÓGICA",
+                questions: [
+                    { id: "q74", label: "Liste TODOS os sistemas/ferramentas que usam:", type: "textarea" },
+                    { id: "q75", label: "Qual é o sistema principal?", type: "text" },
+                    { id: "q76", label: "Sistema principal tem API/webhooks?", type: "radio", options: ["Sim", "Não", "Não sabe"] },
+                    { id: "q78", label: "Acesso automático a dados do banco (API)?", type: "radio", options: ["Sim", "Não", "Em processo"] },
+                    { id: "q80", label: "Onde armazenam documentos importantes?", type: "radio", options: ["Servidor local", "Cloud", "Papel", "Combinação", "Desorganizado"] },
+                    { id: "q81", label: "Se Cloud, qual serviço?", type: "text" },
+                    { id: "q82", label: "Realizam backup regular?", type: "radio", options: ["Diário", "Semanal", "Mensal", "Raramente", "Não"] },
+                    { id: "q83", label: "Qual é a velocidade da internet principal?", type: "text" },
+                    { id: "q84", label: "A empresa tem VPN/acesso remoto?", type: "radio", options: ["Sim", "Não", "Parcial"] },
+                    { id: "q85", label: "Quantas pessoas têm acesso ao ERP?", type: "number" }
+                ]
+            },
+            {
+                title: "SEÇÃO 8: OPORTUNIDADES - DIAGNÓSTICO AUTOMAÇÃO",
+                questions: [
+                    { id: "q86", label: "Recebe notas por email PDF/XML?", type: "radio", options: ["Sim, frequentemente", "Sim, raramente", "Não"] },
+                    { id: "q87", label: "Quantas notas por dia assim?", type: "number" },
+                    { id: "q88", label: "Tempo para processar uma NF (minutos)?", type: "number" },
+                    { id: "q89", label: "Alguém tira dados manualmente do PDF?", type: "radio", options: ["Sim sempre", "Às vezes", "Não"] },
+                    { id: "q90", label: "Dados precisam validação contra pedidos?", type: "radio", options: ["Sim sempre", "Às vezes", "Não"] },
+                    { id: "q91", label: "Sistema aceita dados automáticos?", type: "radio", options: ["Sim", "Não", "Parcialmente"] },
+                    { id: "q94", label: "Seu banco oferece API de transações?", type: "radio", options: ["Sim", "Não", "Não sabe"] },
+                    { id: "q95", label: "Qual é o nome do banco?", type: "text" },
+                    { id: "q101", label: "Fazem previsão estruturada?", type: "radio", options: ["Sim", "Não"] },
+                    { id: "q105", label: "Vezes/mês que refazem previsão por surpresas?", type: "number" },
+                    { id: "q107", label: "Já ficaram sem caixa?", type: "radio", options: ["Frequentemente", "Raramente", "Nunca"] },
+                    { id: "q109", label: "Descreva processo de definir contas a pagar:", type: "textarea" },
+                    { id: "q110", label: "Como geram arquivo de pagamento?", type: "radio", options: ["Excel manual", "Sistema automático", "Online banco", "Outro"] },
+                    { id: "q111", label: "Quantos pagamentos por dia?", type: "number" },
+                    { id: "q112", label: "Horas/dia gastas em pagamentos?", type: "number" },
+                    { id: "q113", label: "Erros de pagamento por mês?", type: "number" }
+                ]
+            },
+            {
+                title: "SEÇÃO 9: OPORTUNIDADES - CONTINUAÇÃO",
+                questions: [
+                    { id: "q117", label: "Descreva fluxo completo de fechamento mensal:", type: "textarea" },
+                    { id: "q118", label: "Tempo total em fechamento (horas)?", type: "number" },
+                    { id: "q119", label: "Quem participa e quanto tempo cada um dedica?", type: "textarea" },
+                    { id: "q120", label: "Principal dificuldade no fechamento?", type: "textarea" },
+                    { id: "q121", label: "Precisam de ajustes manuais ao final?", type: "radio", options: ["Muitos", "Alguns", "Nenhum"] },
+                    { id: "q125", label: "% clientes com atraso >30 dias?", type: "number" },
+                    { id: "q126", label: "Valor total em atraso (R$)?", type: "number" },
+                    { id: "q127", label: "Como fazem cobrança atualmente?", type: "radio", options: ["Email automático", "Manual telefone/WhatsApp", "Combinação", "Sem processo"] },
+                    { id: "q133", label: "Realizam auditoria interna?", type: "radio", options: ["Mensal", "Trimestral", "Anual", "Não"] }
+                ]
+            },
+            {
+                title: "SEÇÃO 10: PRIORIZAÇÃO & CONTATO",
+                questions: [
+                    { id: "q139", label: "Qual oportunidade automatizar PRIMEIRO (maior ROI)?", type: "text" },
+                    { id: "q140", label: "Economia estimada 1º lugar (R$)?", type: "number" },
+                    { id: "q141", label: "Qual seria 2º lugar?", type: "text" },
+                    { id: "q142", label: "Economia estimada 2º lugar (R$)?", type: "number" },
+                    { id: "q143", label: "Qual seria 3º lugar?", type: "text" },
+                    { id: "q144", label: "Economia estimada 3º lugar (R$)?", type: "number" },
+                    { id: "q145", label: "Orçamento disponível (R$)?", type: "number" },
+                    { id: "q146", label: "Prazo máximo para implementação?", type: "radio", options: ["3 meses", "6 meses", "12 meses", "Sem prazo"] },
+                    { id: "q147", label: "ROI máximo aceitável?", type: "radio", options: ["3 meses", "6 meses", "12 meses", "Sem limite"] },
+                    { id: "q150", label: "Nome completo do Gerente Administrativo:", type: "text" },
+                    { id: "q151", label: "Email:", type: "email" },
+                    { id: "q152", label: "Telefone comercial:", type: "text" },
+                    { id: "q153", label: "WhatsApp:", type: "text" },
+                    { id: "q154", label: "Melhor hora para contato?", type: "radio", options: ["08:00-10:00", "10:00-12:00", "14:00-16:00", "16:00-18:00", "Flexível"] },
+                    { id: "q155", label: "Data de preenchimento:", type: "date" },
+                    { id: "q156", label: "Observações adicionais:", type: "textarea" }
+                ]
+            }
+        ];
+
+        let currentSectionIndex = 0;
+
+        function initForm() {
+            const formContent = document.getElementById('formContent');
+            
+            sections.forEach((section, index) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = `section ${index === 0 ? 'active' : ''}`;
+                sectionDiv.id = `section${index}`;
+                
+                let html = `<h2 class="section-title">${section.title}</h2>`;
+                
+                section.questions.forEach(q => {
+                    html += createQuestion(q);
+                });
+                
+                sectionDiv.innerHTML = html;
+                formContent.appendChild(sectionDiv);
+            });
+            
+            updateProgressBar();
+            document.getElementById('totalSections').textContent = sections.length;
+        }
+
+        function createQuestion(q) {
+            let html = `<div class="question-group">`;
+            html += `<label class="question-label">${q.label}</label>`;
+            
+            switch(q.type) {
+                case 'text':
+                case 'email':
+                case 'number':
+                case 'date':
+                    html += `<input type="${q.type}" id="${q.id}" placeholder="Responda aqui...">`;
+                    break;
+                case 'textarea':
+                    html += `<textarea id="${q.id}" placeholder="Descreva com detalhes..."></textarea>`;
+                    break;
+                case 'radio':
+                    html += `<div class="radio-group">`;
+                    q.options.forEach(opt => {
+                        html += `<div class="radio-item"><input type="radio" id="${q.id}_${opt}" name="${q.id}" value="${opt}"><label for="${q.id}_${opt}">${opt}</label></div>`;
+                    });
+                    html += `</div>`;
+                    break;
+                case 'checkbox':
+                    html += `<div class="checkbox-group">`;
+                    q.options.forEach(opt => {
+                        html += `<div class="checkbox-item"><input type="checkbox" id="${q.id}_${opt}" name="${q.id}" value="${opt}"><label for="${q.id}_${opt}">${opt}</label></div>`;
+                    });
+                    html += `</div>`;
+                    break;
+            }
+            
+            html += `</div>`;
+            return html;
+        }
+
+        function updateProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.innerHTML = '';
+            for (let i = 0; i < sections.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = `progress-item ${i === currentSectionIndex ? 'active' : ''}`;
+                progressBar.appendChild(dot);
+            }
+        }
+
+        function nextSection() {
+            if (currentSectionIndex < sections.length - 1) {
+                document.getElementById(`section${currentSectionIndex}`).classList.remove('active');
+                currentSectionIndex++;
+                document.getElementById(`section${currentSectionIndex}`).classList.add('active');
+                updateButtons();
+                updateProgressBar();
+                document.getElementById('currentSection').textContent = currentSectionIndex + 1;
+                window.scrollTo(0, 0);
+            } else {
+                submitForm();
+            }
+        }
+
+        function previousSection() {
+            if (currentSectionIndex > 0) {
+                document.getElementById(`section${currentSectionIndex}`).classList.remove('active');
+                currentSectionIndex--;
+                document.getElementById(`section${currentSectionIndex}`).classList.add('active');
+                updateButtons();
+                updateProgressBar();
+                document.getElementById('currentSection').textContent = currentSectionIndex + 1;
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentSectionIndex === 0;
+            
+            if (currentSectionIndex === sections.length - 1) {
+                nextBtn.textContent = 'Enviar ✓';
+                nextBtn.className = 'btn-submit';
+            } else {
+                nextBtn.textContent = 'Próximo →';
+                nextBtn.className = 'btn-next';
+            }
+        }
+
+        function submitForm() {
+            const formData = new FormData();
+            const responses = {};
+            
+            sections.forEach(section => {
+                section.questions.forEach(q => {
+                    const element = document.getElementById(q.id);
+                    if (element) {
+                        if (q.type === 'radio') {
+                            const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+                            responses[q.id] = checked ? checked.value : '';
+                        } else if (q.type === 'checkbox') {
+                            const checked = Array.from(document.querySelectorAll(`input[name="${q.id}"]:checked`))
+                                .map(el => el.value);
+                            responses[q.id] = checked.join(', ');
+                        } else {
+                            responses[q.id] = element.value;
+                        }
+                    }
+                });
+            });
+            
+            // Enviar para Google Sheets ou servidor
+            const jsonData = JSON.stringify(responses);
+            
+            // Log para debug
+            console.log('Respostas:', responses);
+            
+            // Mostrar mensagem de sucesso
+            showSuccessMessage();
+        }
+
+        function showSuccessMessage() {
+            document.querySelector('.content').innerHTML = `
+                <div class="success-message">
+                    <h2>✓ Formulário Enviado com Sucesso!</h2>
+                    <p>Obrigado por responder este questionário de forma tão detalhada.</p>
+                    <p>Suas respostas serão analisadas e entraremos em contato em breve.</p>
+                    <p style="margin-top: 20px; font-size: 12px;">Email de confirmação: Verifique seu email</p>
+                </div>
+            `;
+        }
+
+        // Inicializar formulário
+        document.addEventListener('DOMContentLoaded', function() {
+            initForm();
+            updateButtons();
+        });
+    </script>
+</body>
+</html>
