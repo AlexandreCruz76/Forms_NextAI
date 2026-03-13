@@ -1,7 +1,7 @@
 [build]
-  command = "echo 'Pronto'"
+  command = "echo 'Build complete'"
   publish = "."
-  
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
